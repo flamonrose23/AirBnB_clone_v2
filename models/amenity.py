@@ -5,22 +5,12 @@ from models import storage_type
 from sqlalchemy import Column, String
 
 
-<<<<<<< HEAD
-class Amenity(BaseModel):
+class Amenity(BaseModel, Base):
     """amenity class"""
     __tablename__ = 'amenities'
-    if storage_type == 'db':
+    if type_of_storage == 'db':
         name = Column(String(128), nullable=False)
         place_amenities = relationship("Place", secondary="place_amenity",
                 viewonly=False)
-=======
-class Amenity(BaseModel, Base):
-    """
-    Amenity class
-    """
-    __tablename__ = 'amenities'
-    if storage_type == 'db':
-        name = Column(String(128), nullable=False)
->>>>>>> 2357cb0e1bb4ca905f3be1331d61d3062fb7e892
     else:
         name = ""
