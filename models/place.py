@@ -1,29 +1,30 @@
 #!/usr/bin/python3
-""" Place Module for HBNB project """
-from models.base_model import BaseModel
-from sqlalchemy import Column, String, Integer, Float, ForeignKey
-from sqlalchemy.sql.schema import Table
-from sqlalchemy.orm import relationship
+""" Defining Place Module for HBNB project """
+
 from models.amenity import Amenity
 from models.review import Review
+from models.base_model import BaseModel, Base
 from models import storage_type
+from sqlalchemy import Column, String, Integer, Float, ForeignKey, Table
+from sqlalchemy.orm import relationship
 
-if type_of_storage == 'db':
+if storage_type == 'db':
     place_amenity = Table('place_amenity', Base.metadata,
-            Column('place_id', String(60),
-                ForeignKey('places.id'),
-                primary_key=True,
-                nullable=False),
-            Column('amenity_id', String(60),
-                ForeignKey('amenities.id'),
-                primary_key=True,
-                nullable=False)
-            )
+                          Column('place_id', String(60),
+                                 ForeignKey('places.id'),
+                                 primary_key=True,
+                                 nullable=False),
+                          Column('amenity_id', String(60),
+                                 ForeignKey('amenities.id'),
+                                 primary_key=True,
+                                 nullable=False)
+                          )
 
-class Place(BaseModel):
-    """ A place to stay """
+
+class Place(BaseModel, Base):
+    """ Defining place to stay """
     __tablename__ = 'places'
-    if type_of_storage == 'db':
+    if storage_type == 'db':
         city_id = Column(String(60), ForeignKey('cities.id'), nullable=False)
         user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
         name = Column(String(128), nullable=False)
@@ -32,12 +33,12 @@ class Place(BaseModel):
         number_bathrooms = Column(Integer, nullable=False, default=0)
         max_guest = Column(Integer, nullable=False, default=0)
         price_by_night = Column(Integer, nullable=False, default=0)
-        latitude = Column(Float, nullable=False)
-        longtitude = Column(Float, nullable=False)
+        latitude = Column(Float, nullable=True)
+        longitude = Column(Float, nullable=True)
         reviews = relationship('Review', backref='place',
-                cascade='all, delete, delete-orphan')
+                               cascade='all, delete, delete-orphan')
         amenities = relationship('Amenity', secondary=place_amenity,
-                viewonly=False, backref='place_amenities')
+                                 viewonly=False, backref='place_amenities')
     else:
         city_id = ""
         user_id = ""
@@ -53,29 +54,38 @@ class Place(BaseModel):
 
         @property
         def reviews(self):
-            """list of review instances with place id"""
+            ''' returning list of review instances with place_id
+                FileStorage relationship between Place and Review
+            '''
             from models import storage
-            all_reviws = storage.all(Review)
-            rev_list = []
-            for reviw in all_reviws.values():
-                if reviw.place_id == self.id:
-                    rev_list.append(reviw)
-            return rev_list
+            all_revs = storage.all(Review)
+            lst = []
+            for rev in all_revs.values():
+                if rev.place_id == self.id:
+                    lst.append(rev)
+            return lst
 
         @property
         def amenities(self):
-            """list of amenities"""
+            ''' returns the list of Amenity instances
+                based on the attribute amenity_ids that
+                contains all Amenity.id linked to the Place
+            '''
             from models import storage
-            all_amenitys = storage.all(Amenity)
-            amen_list = []
-            for ament in all_amenitys.values():
-                if ament.id in self.amenity_ids:
-                    amen_list.append(ament)
-            return amen_list
+            all_amens = storage.all(Amenity)
+            lst = []
+            for amen in all_amens.values():
+                if amen.id in self.amenity_ids:
+                    lst.append(amen)
+            return lst
 
         @amenities.setter
-        def amenities(self):
-            """adding amenity.id to amenity_ids"""
+        def amenities(self, obj):
+            ''' method for adding an Amenity.id to the
+                attribute amenity_ids. accepts only Amenity
+                objects
+            '''
             if obj is not None:
-                if obj.id not in self.amenity_ids:
-                    self.amenity_ids.append(obj.id)
+                if isinstance(obj, Amenity):
+                    if obj.id not in self.amenity_ids:
+                        self.amenity_ids.append(obj.id)

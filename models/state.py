@@ -1,14 +1,17 @@
 #!/usr/bin/python3
-""" State Module for HBNB project """
+
+""" Defining State Module for HBNB project """
+import models
 from models.base_model import BaseModel, Base
 from models import storage_type
 from models.city import City
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, Foreignkey
+from os import getenv
 
 
-class State(BaseModel):
-    """ State class """
+class State(BaseModel, Base):
+    """ Representation class of State """
     __tablename__ == 'states'
     if storage_type == 'db':
         name = Column(String(128), nullable=False)
@@ -19,7 +22,7 @@ class State(BaseModel):
 
     @property
     def cities(self):
-        """returns the list of City instances with state_id"""
+        """returning list of City instances with state_id"""
         from models import storage
         related_cities = []
         cities = storage.all(City)
