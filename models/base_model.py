@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, DateTime
-from models import storage  # Assuming storage is properly imported
+from models import storage
 
 
 Base = declarative_base()
@@ -12,7 +12,7 @@ Base = declarative_base()
 
 class BaseModel:
     """A base class for all hbnb models"""
-    __tablename__ = 'base_model'  # Define your table name
+    __tablename__ = 'base_model'  
 
     id = Column(String(60), nullable=False, primary_key=True, unique=True)
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
@@ -35,7 +35,7 @@ class BaseModel:
                     setattr(self, k, v)
 
     def __str__(self):
-        """Returns a string representation of the instance"""
+        """Returns a str representation of the instance"""
         return '[{}] ({}) {}'.format(type(self).__name__, 
                 self.id, self.__dict__)
 
@@ -48,7 +48,7 @@ class BaseModel:
         storage.save()
 
     def to_dict(self):
-        """Converts the instance into a dict format"""
+        """Converts the instance into a dictionary format"""
         dct = self.__dict__.copy()
         dct['__class__'] = type(self).__name__
         for k, v in dct.items():
