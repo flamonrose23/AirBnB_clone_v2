@@ -21,9 +21,7 @@ class FileStorage:
     Serializing instances to JSON file & deserializing back to instances
     """
 
-    # string - path to the JSON file
     __file_path = "file.json"
-    # dictionary - empty but will store all objects by <class name>.id
     __objects = {}
 
     def all(self, cls=None):
@@ -73,9 +71,9 @@ class FileStorage:
         Deleting obj from __objects if it’s inside
         """
         if obj is not None:
-            key = obj.__class__.__name__ + '.' + obj.id
-            if key in self.__objects:
-                del self.__objects[key]
+            objct_key = obj.__class__.__name__ + '.' + obj.id
+            if objct_key in self.__objects:
+                del self.__objects[objct_key]
 
     def close(self):
         """
