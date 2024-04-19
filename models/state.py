@@ -13,7 +13,7 @@ from os import getenv
 class State(BaseModel, Base):
     """ Representation class of State """
     __tablename__ == 'states'
-    if storage_type == 'db':
+    if type_of_storage == 'db':
         name = Column(String(128), nullable=False)
         cities = relationship('City', backref='state',
                 cascade='all, delete, delete-orphan')
