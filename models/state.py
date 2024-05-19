@@ -11,22 +11,31 @@ from os import getenv
 
 
 class State(BaseModel, Base):
-    """ Representation class of State """
-    __tablename__ == 'states'
-    if type_of_storage == 'db':
+    """
+    Representation of state
+    """
+    if models.storage_t == "db":
+        __tablename__ = 'states'
         name = Column(String(128), nullable=False)
-        cities = relationship('City', backref='state',
-                cascade='all, delete, delete-orphan')
+        cities = relationship("City", backref="state")
     else:
         name = ""
 
-    @property
-    def cities(self):
-        """returning list of City instances with state_id"""
-        from models import storage
-        related_cities = []
-        cities = storage.all(City)
-        for city in cities.value():
-            if city.state_id == self.id:
-                related_cities.append(city)
-        return related_cities
+    def __init__(self, *args, **kwargs):
+        """
+        Initializing state
+        """
+        super().__init__(*args, **kwargs)
+
+    if models.storage_t != "db":
+        @property
+        def cities(self):
+            """
+            Gettering for list of city instances related t state
+            """
+            city_list = []
+            all_cities = models.storage.all(City)
+            for city in all_cities.values():
+                if city.state_id == self.id:
+                    city_list.append(city)
+            return city_list
